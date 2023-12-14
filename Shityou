@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+    <title>Escape from Furries</title>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const player = {
+            x: 50,
+            y: 50,
+            width: 20,
+            height: 20,
+            speed: 5,
+        };
+
+        const furries = [];
+        const furrySpeed = 2;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function spawnFurry() {
+            const furry = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                width: 20,
+                height: 20,
+            };
+            furries.push(furry);
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawFurries() {
+            ctx.fillStyle = "red";
+            furries.forEach((furry) => {
+                ctx.fillRect(furry.x, furry.y, furry.width, furry.height);
+            });
+        }
+
+        function update() {
+            // Move player based on arrow keys
+            window.addEventListener("keydown", (e) => {
+                switch (e.key) {
+                    case "ArrowUp":
+                        player.y -= player.speed;
+                        break;
+                    case "ArrowDown":
+                        player.y += player.speed;
+                        break;
+                    case "ArrowLeft":
+                        player.x -= player.speed;
+                        break;
+                    case "ArrowRight":
+                        player.x += player.speed;
+                        break;
+                }
+            });
+
+            // Move furries towards the player
+            furries.forEach((furry) => {
+                if (furry.x < player.x) furry.x += furrySpeed;
+                if (furry.x > player.x) furry.x -= furrySpeed;
+                if (furry.y < player.y) furry.y += furrySpeed;
+                if (furry.y > player.y) furry.y -= furrySpeed;
+            });
+
+            // Check for collisions
+            furries.forEach((furry) => {
+                if (
+                    player.x < furry.x + furry.width &&
+                    player.x + player.width > furry.x &&
+                    player.y < furry.y + furry.height &&
+                    player.y + player.height > furry.y
+                ) {
+                    alert("Game Over! You were caught by a furry!");
+                    location.reload();
+                }
+            });
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw player and furries
+            drawPlayer();
+            drawFurries();
+        }
+
+        // Game loop
+        function gameLoop() {
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Spawn a furry every 2 seconds
+        setInterval(spawnFurry, 2000);
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
